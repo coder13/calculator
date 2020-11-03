@@ -1,36 +1,11 @@
 const { Num, NegationOp, FunctionOp, BinOp } = require('./ast');
-
-const regex = /\d+(\.\d+)?|\+|\-|\*|\/|\^|\(|\)|([a-zA-Z]+)/g;
-
-class Token {
-  constructor(type, token) {
-    this.type = type;
-    this.token = token;
-  }
-}
+const tokenize = require('./tokenize');
 
 class Interpreter {
-  constructor(code) {
-    this.code = code;
-    this.tokens = this.tokenize(code);
+  constructor() {
+    this.tokens = [];
+    this.variables = {};
     this.currentToken = 0;
-  }
-
-  tokenize(expression) {
-    let re = expression.match(regex);
-    return re.map((token) => {
-      if (['+', '-', '*', '/', '^'].indexOf(token) > -1) {
-        return new Token('Operator', token);
-      } else if (token == '(') {
-        return new Token('OpenParen', token);
-      } else if (token == ')') {
-        return new Token('CloseParen', token);
-      } else if (/[a-z]+/i.test(token)) {
-        return new Token('Function', token);
-      } else {
-        return new Token('Number', token);
-      }
-    });
   }
 
   getCurrentToken() {
@@ -128,7 +103,10 @@ class Interpreter {
     return node;
   }
 
-  parse () {
+  parse (code, state) {
+    this.tokens = tokenize(code);
+    this.variables = state || {};
+    this.currentToken = 0;
     return this.expr();
   }
 };

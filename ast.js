@@ -1,3 +1,5 @@
+const { functions } = require('./constants');
+
 class AST {
   constructor (type) {
     this.type = type;
@@ -37,14 +39,6 @@ module.exports.BinOp = class extends AST {
   }
 }
 
-const funcs = {
-  'sin': Math.sin,
-  'cos': Math.cos,
-  'round': Math.round,
-  'floor': Math.floor,
-  'ceil': Math.ceil,
-};
-
 module.exports.FunctionOp = class extends AST {
   constructor(name, arg) {
     super('Function');
@@ -53,10 +47,10 @@ module.exports.FunctionOp = class extends AST {
   }
 
   evaluate() {
-    if (!funcs[this.name.token.toLowerCase()]) {
+    if (!functions[this.name.token.toLowerCase()]) {
         throw new Error('Undefined function');
     }
-    return funcs[this.name.token.toLowerCase()](this.argument.evaluate());
+    return functions[this.name.token.toLowerCase()](this.argument.evaluate());
   }
 }
 

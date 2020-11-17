@@ -10,7 +10,7 @@ class Token {
   }
 }
 
-module.exports = function tokenize (expression) {
+module.exports.tokenize = function tokenize (expression) {
   let re = expression.match(regex);
   return re.map((token) => {
     if (['+', '-', '*', '/', '^'].indexOf(token) > -1) {
@@ -30,3 +30,5 @@ module.exports = function tokenize (expression) {
     }
   });
 };
+
+module.exports.Token = Token;

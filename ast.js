@@ -8,6 +8,8 @@ class AST {
   evaluate () {
     throw new Error('function: evaluate, not implemented');
   }
+
+  toString() {}
 }
 
 module.exports.BinOp = class extends AST {
@@ -37,6 +39,10 @@ module.exports.BinOp = class extends AST {
         throw new Error('Undefined operator: ' + this.op);
     }
   }
+
+  toString() {
+    return `(${this.left.toString()} ${this.op.token} ${this.right.toString()})`;
+  }
 }
 
 module.exports.FunctionOp = class extends AST {
@@ -52,6 +58,10 @@ module.exports.FunctionOp = class extends AST {
     }
     return functions[this.name.token.toLowerCase()](this.argument.evaluate());
   }
+
+  toString() {
+    return `${this.name.token.toLowerCase()}(${this.argument})`;
+  }
 }
 
 module.exports.NegationOp = class extends AST {
@@ -63,6 +73,10 @@ module.exports.NegationOp = class extends AST {
   evaluate() {
     return -this.term.evaluate();
   }
+
+  toString() {
+    return `-${this.term.toString()}`;
+  }
 }
 
 module.exports.Num = class extends AST {
@@ -73,5 +87,24 @@ module.exports.Num = class extends AST {
 
   evaluate() {
     return +this.token;
+  }
+
+  toString() {
+    return this.token.toString();
+  }
+}
+
+module.exports.Variable = class extends AST {
+  constructor(token) {
+    super('Variable');
+    this.token = token;
+  }
+
+  evaluate() {
+    throw new Error('undefined behavior for evaluating variables');
+  }
+
+  toString() {
+    return this.token.toString();
   }
 }

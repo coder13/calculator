@@ -1,4 +1,5 @@
-const Interpreter = require('./interpreter.js');
+#!/usr/bin/env node
+const Interpreter = require('../lib/interpreter.js');
 
 const e = (code) => {
   let inter = new Interpreter();

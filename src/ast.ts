@@ -1,4 +1,4 @@
-const { functions } = require('./constants');
+const { functions } = require('./constants.ts');
 
 class AST {
   constructor (type) {

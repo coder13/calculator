@@ -1,5 +1,5 @@
-const { Num, Variable, NegationOp, FunctionOp, BinOp } = require('./ast');
-const { Token, tokenize } = require('./tokenize');
+const { Num, Variable, NegationOp, FunctionOp, BinOp } = require('./ast.ts');
+const { Token, tokenize } = require('./tokenize.ts');
 
 /*
   Variables todo:

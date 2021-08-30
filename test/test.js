@@ -1,6 +1,6 @@
 const should = require('chai').should();
 
-const Interpreter = require('../interpreter.js');
+const Interpreter = require('../src/interpreter.ts');
 const inter = new Interpreter();
 
 describe('syntax', function () {

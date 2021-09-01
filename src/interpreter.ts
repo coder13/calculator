@@ -1,5 +1,5 @@
-const { Num, Variable, NegationOp, FunctionOp, BinOp } = require('./ast.ts');
-const { Token, tokenize } = require('./tokenize.ts');
+import { Num, Variable, NegationOp, FunctionOp, BinOp } from './ast';
+import { Token, tokenize } from './tokenize';
 
 /*
   Variables todo:
@@ -17,9 +17,12 @@ const { Token, tokenize } = require('./tokenize.ts');
 */
 
 class Term {
-  constructor(value, factor) {
+  value: number;
+  factor: number;
+
+  constructor(value: number, factor: number = 1) {
     this.value = value;
-    this.factor = exponent || 1;
+    this.factor = factor || 1;
   }
 
   simplify() {
@@ -32,6 +35,9 @@ class Term {
 };
 
 class Expression {
+  terms: Term[];
+  exponent: Term;
+
   constructor() {
     this.terms = [];
     this.exponent = new Term(1);
@@ -48,9 +54,13 @@ class Expression {
 
 
 class Interpreter {
+  tokens: Token[];
+  variables: Map<string, number>;
+  currentToken: number;
+
   constructor() {
     this.tokens = [];
-    this.variables = {};
+    this.variables = new Map();
     this.currentToken = 0;
   }
 

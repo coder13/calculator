@@ -1,6 +1,9 @@
-const { functions } = require('./constants.ts');
+import { functions } from './constants';
+import { Token } from './tokenize';
 
-class AST {
+export class AST {
+  type: string;
+
   constructor (type) {
     this.type = type;
   }
@@ -12,7 +15,11 @@ class AST {
   toString() {}
 }
 
-module.exports.BinOp = class extends AST {
+export class BinOp extends AST {
+  left: BinOp;
+  op: Token;
+  right: BinOp;
+
   constructor(left, op, right) {
     super('Operator');
     this.left = left;
@@ -45,7 +52,10 @@ module.exports.BinOp = class extends AST {
   }
 }
 
-module.exports.FunctionOp = class extends AST {
+export class FunctionOp extends AST {
+  name: Token;
+  argument: AST;
+
   constructor(name, arg) {
     super('Function');
     this.name = name;
@@ -64,7 +74,9 @@ module.exports.FunctionOp = class extends AST {
   }
 }
 
-module.exports.NegationOp = class extends AST {
+export class NegationOp extends AST {
+  term: AST;
+
   constructor(term) {
     super('Negate');
     this.term = term;
@@ -79,7 +91,9 @@ module.exports.NegationOp = class extends AST {
   }
 }
 
-module.exports.Num = class extends AST {
+export class Num extends AST {
+  token: Token;
+
   constructor(token) {
     super('Number');
     this.token = token;
@@ -94,7 +108,9 @@ module.exports.Num = class extends AST {
   }
 }
 
-module.exports.Variable = class extends AST {
+export class Variable extends AST {
+  token: Token;
+
   constructor(token) {
     super('Variable');
     this.token = token;

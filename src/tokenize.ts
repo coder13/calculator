@@ -3,14 +3,17 @@ const funcNames = Object.keys(functions);
 
 const regex = /\d+(\.\d+)?|\+|\-|\*|\/|\^|\(|\)|([a-zA-Z]+)/g;
 
-class Token {
+export class Token {
+  type: string;
+  token: string;
+
   constructor(type, token) {
     this.type = type;
     this.token = token;
   }
 }
 
-module.exports.tokenize = function tokenize (expression) {
+export function tokenize (expression) {
   let re = expression.match(regex);
   return re.map((token) => {
     if (['+', '-', '*', '/', '^'].indexOf(token) > -1) {
@@ -30,5 +33,3 @@ module.exports.tokenize = function tokenize (expression) {
     }
   });
 };
-
-module.exports.Token = Token;

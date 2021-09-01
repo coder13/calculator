@@ -6,8 +6,8 @@ const e = (code) => {
   let parsed = inter.parse(code);
   console.log(inter.tokens);
   console.log(parsed);
-  return parsed.toString();
-  // return parsed.evaluate();
+  // return parsed.toString();
+  return parsed.evaluate();
 }
 
 console.log(e(process.argv[2]));

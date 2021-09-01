@@ -1,4 +1,4 @@
-module.exports.functions = {
+export const functions = {
   'sin': Math.sin,
   'cos': Math.cos,
   'tan': Math.tan,

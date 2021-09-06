@@ -1,30 +1,33 @@
 import { functions } from './constants';
 import { Token } from './tokenize';
 
-export abstract class AST {
+export class AST {
   type: string;
 
-  constructor(type: string) {
+  constructor (type) {
     this.type = type;
-  };
+  }
 
-  abstract evaluate(): number;
-  abstract toString(): String;
-};
+  evaluate () {
+    throw new Error('function: evaluate, not implemented');
+  }
+
+  toString() {}
+}
 
 export class BinOp extends AST {
-  left: AST;
+  left: BinOp;
   op: Token;
-  right: AST;
-  
-  constructor(left: AST, op: Token, right: AST) {
+  right: BinOp;
+
+  constructor(left, op, right) {
     super('Operator');
     this.left = left;
     this.op = op;
     this.right = right;
   }
 
-  evaluate (): number {
+  evaluate () {
     let left = this.left.evaluate();
     let right = this.right.evaluate();
 
@@ -53,13 +56,13 @@ export class FunctionOp extends AST {
   name: Token;
   argument: AST;
 
-  constructor(name: Token, arg: AST) {
+  constructor(name, arg) {
     super('Function');
     this.name = name;
     this.argument = arg;
   }
 
-  evaluate(): number {
+  evaluate() {
     if (!functions[this.name.token.toLowerCase()]) {
         throw new Error('Undefined function');
     }
@@ -79,7 +82,7 @@ export class NegationOp extends AST {
     this.term = term;
   }
 
-  evaluate(): number {
+  evaluate() {
     return -this.term.evaluate();
   }
 
@@ -96,7 +99,7 @@ export class Num extends AST {
     this.token = token;
   }
 
-  evaluate(): number {
+  evaluate() {
     return +this.token;
   }
 
@@ -113,7 +116,7 @@ export class Variable extends AST {
     this.token = token;
   }
 
-  evaluate(): number {
+  evaluate() {
     throw new Error('undefined behavior for evaluating variables');
   }
 

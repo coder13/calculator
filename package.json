@@ -7,7 +7,7 @@
     "build": "tsc",
     "lint": "eslint ./src/ --ext .ts,.js --fix",
     "test": "mocha",
-    "test:watch": "mocha --watch --watch-files src/**/*,tests/**/*.test.ts",
+    "test:watch": "mocha --watch --watch-files src/**/*,test/**/*.test.ts",
     "ts-node": "ts-node",
     "nodemon": "nodemon"
   },

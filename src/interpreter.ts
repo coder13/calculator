@@ -52,8 +52,7 @@ class Expression {
   }
 };
 
-
-class Interpreter {
+export default class Interpreter {
   tokens: Token[];
   variables: Map<string, number>;
   currentToken: number;
@@ -169,12 +168,10 @@ class Interpreter {
     return node;
   }
 
-  parse (code, state) {
+  parse (code, state?) {
     this.tokens = tokenize(code);
     this.variables = state || {};
     this.currentToken = 0;
     return this.expr();
   }
 };
-
-module.exports = Interpreter;

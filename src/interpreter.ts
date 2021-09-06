@@ -1,4 +1,4 @@
-import { Num, Variable, NegationOp, FunctionOp, BinOp } from './ast';
+import { AST, Num, Variable, NegationOp, FunctionOp, BinOp } from './ast';
 import { Token, tokenize } from './tokenize';
 
 /*
@@ -55,27 +55,27 @@ class Expression {
 export default class Interpreter {
   tokens: Token[];
   variables: Map<string, number>;
-  currentToken: number;
+  currentTokenIndex: number;
 
   constructor() {
     this.tokens = [];
     this.variables = new Map();
-    this.currentToken = 0;
+    this.currentTokenIndex = 0;
   }
 
-  getCurrentToken() {
-    return this.tokens[this.currentToken];
+  getCurrentToken(): Token {
+    return this.tokens[this.currentTokenIndex];
   }
 
-  getNextToken() {
-    if (!this.tokens[this.currentToken]) {
-      throw new Error('Unexpected end of input at token: ' + this.currentToken);
+  getNextToken(): Token {
+    if (!this.tokens[this.currentTokenIndex]) {
+      throw new Error('Unexpected end of input at token: ' + this.currentTokenIndex);
     }
 
-    return this.tokens[this.currentToken++];
+    return this.tokens[this.currentTokenIndex++];
   }
 
-  eat(tokenType) {
+  eat(tokenType): Token {
     if (this.getCurrentToken().type === tokenType) {
       return this.getNextToken();
     } else {
@@ -83,11 +83,11 @@ export default class Interpreter {
     }
   }
 
-  reachedEndOfInput () {
-    return this.currentToken >= this.tokens.length;
+  reachedEndOfInput (): boolean {
+    return this.currentTokenIndex >= this.tokens.length;
   }
 
-  item() {
+  item(): AST {
     let token = this.getNextToken();
 
     if (token.token === '-') {
@@ -109,7 +109,7 @@ export default class Interpreter {
       this.eat('CloseParen');
 
       if (!this.reachedEndOfInput() && this.getCurrentToken().type === 'OpenParen') {
-        this.currentToken++;
+        this.currentTokenIndex++;
         let expr = this.expr();
         this.eat('CloseParen');
         return new BinOp(node, new Token('Operator', '*'), expr);
@@ -128,7 +128,7 @@ export default class Interpreter {
     throw new Error(`Undefined token: ${token.type}`);
   }
 
-  factor () {
+  factor(): AST {
     let item = this.item();
 
     if (this.reachedEndOfInput()) {
@@ -136,14 +136,14 @@ export default class Interpreter {
     }
 
     if (this.getCurrentToken().token === '^') {
-      this.currentToken++;
+      this.currentTokenIndex++;
       return new BinOp(item, new Token('Operator', '^'), this.factor());
     }
 
     return item;
   }
 
-  term () {
+  term(): AST {
     let node = this.factor();
 
     while (!this.reachedEndOfInput()
@@ -155,7 +155,7 @@ export default class Interpreter {
     return node;
   }
 
-  expr () {
+  expr(): AST {
     let node = this.term();
 
     while (!this.reachedEndOfInput()
@@ -168,10 +168,10 @@ export default class Interpreter {
     return node;
   }
 
-  parse (code, state?) {
+  parse(code: string, state?): AST {
     this.tokens = tokenize(code);
     this.variables = state || {};
-    this.currentToken = 0;
+    this.currentTokenIndex = 0;
     return this.expr();
   }
 };

@@ -1,4 +1,4 @@
-const { functions } = require('./constants.ts');
+const { functions } = require('./constants');
 const funcNames = Object.keys(functions);
 
 const regex = /\d+(\.\d+)?|\+|\-|\*|\/|\^|\(|\)|([a-zA-Z]+)/g;

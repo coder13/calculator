@@ -4,7 +4,12 @@
   "description": "Jut some simple lexical analysis and building an Abstract Syntax Tree to evaluate simple mathematical expresssions",
   "main": "ast.js",
   "scripts": {
-    "test": "mocha -r ts-node/register tests/**/*.test.ts"
+    "build": "tsc",
+    "lint": "eslint ./src/ --ext .ts,.js --fix",
+    "test": "mocha",
+    "test:watch": "mocha --watch --watch-files src/**/*,tests/**/*.test.ts",
+    "ts-node": "ts-node",
+    "nodemon": "nodemon"
   },
   "repository": {
     "type": "git",

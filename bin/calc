@@ -1,13 +1,11 @@
-#!/usr/bin/env ts-node
-const Interpreter = require('../src/interpreter');
+#!/usr/bin/env node
+const { Interpreter } = require('../dist');
 
-const e = (code) => {
-  let inter = new Interpreter();
-  let parsed = inter.parse(code);
-  console.log(inter.tokens);
-  console.log(parsed);
-  // return parsed.toString();
-  return parsed.evaluate();
-}
+const code = process.argv[2];
 
-console.log(e(process.argv[2]));
+const inter = new Interpreter();
+const parsed = inter.parse(code);
+console.log(inter.tokens);
+console.log(parsed);
+// return parsed.toString();
+console.log(parsed.evaluate());

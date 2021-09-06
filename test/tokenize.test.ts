@@ -28,4 +28,12 @@ describe('Basic Tokens', function () {
     tokens[2].should.deep.equal(new Token('CloseParen', ')'));
     tokens[3].should.deep.equal(new Token('Variable', 'foo'));
   });
+  
+  it('Parses variable tokens', function() {
+    const tokens = tokenize('foo = 2');
+    tokens.should.be.a('array').with.lengthOf(3);
+    tokens[0].should.deep.equal(new Token('Variable', 'foo'));
+    tokens[1].should.deep.equal(new Token('Equals', '='));
+    tokens[2].should.deep.equal(new Token('Number', '2'));
+  })
 });

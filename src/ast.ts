@@ -1,18 +1,15 @@
 import { functions } from './constants';
 import { Token } from './tokenize';
 
-export class AST {
+export abstract class AST {
   type: string;
 
-  constructor (type) {
+  constructor(type) {
     this.type = type;
   }
 
-  evaluate () {
-    throw new Error('function: evaluate, not implemented');
-  }
-
-  toString() {}
+  abstract evaluate(): number;
+  abstract toString(): string;
 }
 
 export class BinOp extends AST {
@@ -27,7 +24,7 @@ export class BinOp extends AST {
     this.right = right;
   }
 
-  evaluate () {
+  evaluate(): number {
     let left = this.left.evaluate();
     let right = this.right.evaluate();
 
@@ -47,7 +44,7 @@ export class BinOp extends AST {
     }
   }
 
-  toString() {
+  toString(): string {
     return `(${this.left.toString()} ${this.op.token} ${this.right.toString()})`;
   }
 }
@@ -62,14 +59,14 @@ export class FunctionOp extends AST {
     this.argument = arg;
   }
 
-  evaluate() {
+  evaluate(): number {
     if (!functions[this.name.token.toLowerCase()]) {
         throw new Error('Undefined function');
     }
     return functions[this.name.token.toLowerCase()](this.argument.evaluate());
   }
 
-  toString() {
+  toString(): string {
     return `${this.name.token.toLowerCase()}(${this.argument})`;
   }
 }
@@ -82,11 +79,11 @@ export class NegationOp extends AST {
     this.term = term;
   }
 
-  evaluate() {
+  evaluate(): number {
     return -this.term.evaluate();
   }
 
-  toString() {
+  toString(): string {
     return `-${this.term.toString()}`;
   }
 }
@@ -99,11 +96,11 @@ export class Num extends AST {
     this.token = token;
   }
 
-  evaluate() {
+  evaluate(): number {
     return +this.token;
   }
 
-  toString() {
+  toString(): string {
     return this.token.toString();
   }
 }
@@ -116,11 +113,11 @@ export class Variable extends AST {
     this.token = token;
   }
 
-  evaluate() {
+  evaluate(): number {
     throw new Error('undefined behavior for evaluating variables');
   }
 
-  toString() {
+  toString(): string {
     return this.token.toString();
   }
 }

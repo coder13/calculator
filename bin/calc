@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const { Interpreter } = require('../dist');
+const { Interpreter } = require('../dist/');
 
 const code = process.argv[2];
 

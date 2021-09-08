@@ -1,9 +1,18 @@
 const { functions } = require('./constants');
 const funcNames = Object.keys(functions);
 
-const regex = /\d+(\.\d+)?|\+|\-|\*|\/|\^|\(|\)|=|([a-zA-Z]+)/g;
+const regex = /\d+(\.\d+)?|\+|\-|\*|\/|\^|\(|\)|\[|\]|=|([a-zA-Z]+)/g;
 
-export type TokenType = 'Operator' | 'OpenParen' | 'CloseParen' | 'Equals' | 'Function' | 'Variable' | 'Number';
+export type TokenType = 
+    'Operator'
+  | 'OpenParen'
+  | 'CloseParen'
+  | 'OpenSquareBracket'
+  | 'CloseSquareBracket'
+  | 'Equals'
+  | 'Function'
+  | 'Variable'
+  | 'Number';
 
 export class Token {
   type: TokenType;
@@ -24,6 +33,10 @@ export function tokenize (expression: string): Token[] {
       return new Token('OpenParen', token);
     } else if (token == ')') {
       return new Token('CloseParen', token);
+    } else if (token == '[') {
+      return new Token('OpenSquareBracket', token);
+    } else if (token == ']') {
+      return new Token('CloseSquareBracket', token);
     } else if (token == '=') {
       return new Token('Equals', token);
     } else if (/[a-z]+/i.test(token)) {

@@ -52,21 +52,40 @@ class Expression {
   }
 };
 
+type OpenParen = 'OpenParen' | 'OpenSquareBracket';
+type CloseParen = 'CloseParen' | 'CloseSquareBracket';
+type Parens = OpenParen | CloseParen;
+
+const ExpectedClosingBracket = {
+  OpenParen: 'CloseParen',
+  OpenSquareBracket: 'CloseSquareBracket',
+};
+
 export default class Interpreter {
   tokens: Token[];
+  parens: Parens[];
   variables: Map<string, number>;
   currentTokenIndex: number;
 
   constructor() {
     this.tokens = [];
+    this.parens = [];
     this.variables = new Map();
     this.currentTokenIndex = 0;
   }
 
+  /**
+   * Gets the token specified by the current token index pointer
+   * @returns {Token} the next token
+   */
   getCurrentToken(): Token {
     return this.tokens[this.currentTokenIndex];
   }
 
+  /**
+   * Gets the next token provided we're not at our end of input and increments the current token index pointer
+   * @returns {Token} the next token
+   */
   getNextToken(): Token {
     if (!this.tokens[this.currentTokenIndex]) {
       throw new Error('Unexpected end of input at token: ' + this.currentTokenIndex);
@@ -81,6 +100,10 @@ export default class Interpreter {
    * @returns 
    */
   eat(tokenType: TokenType): Token {
+    if (this.reachedEndOfInput()) {
+      throw new Error(`Syntax error: unexpected end of input`);
+    }
+
     if (this.getCurrentToken().type === tokenType) {
       return this.getNextToken();
     } else {
@@ -92,7 +115,11 @@ export default class Interpreter {
     return this.currentTokenIndex >= this.tokens.length;
   }
 
-  item() {
+  /**
+   * Eats the next item. This item is either a number, a function, or an expression beginning with an open parentheses or negation.
+   * @returns {AST} AST representation of the next item
+   */
+  item(): AST {
     let token = this.getNextToken();
 
     if (token.token === '-') {
@@ -102,21 +129,31 @@ export default class Interpreter {
     if (token.type === 'Number') {
       let node = new Num(token.token);
 
+      if (this.reachedEndOfInput()) {
+        return node;
+      }
+
       token = this.getCurrentToken();
-      if (!!token && ['OpenParen', 'Function', 'Variable'].indexOf(token.type) > -1) {
+
+      if (['OpenParen', 'OpenSquareBracket', 'Function', 'Variable'].includes(token.type)) {  
         return new BinOp(node, new Token('Operator', '*'), this.factor());
       } else {
         return node;
       }
-    } else if (token.type === 'OpenParen') {
+    } else if (token.type === 'OpenParen' || token.type === 'OpenSquareBracket') {
+      this.parens.push(token.type);
+
       let node = this.expr();
 
-      this.eat('CloseParen');
+      this.eat(ExpectedClosingBracket[this.parens.pop()]);
 
-      if (!this.reachedEndOfInput() && this.getCurrentToken().type === 'OpenParen') {
+      if (!this.reachedEndOfInput()
+        && (this.getCurrentToken().type === 'OpenParen' || this.getCurrentToken().type === 'OpenSquareBracket')) {
+        this.parens.push(this.getCurrentToken().type as OpenParen);
+
         this.currentTokenIndex++;
         let expr = this.expr();
-        this.eat('CloseParen');
+        this.eat(ExpectedClosingBracket[this.parens.pop()]);
         return new BinOp(node, new Token('Operator', '*'), expr);
       }
 
@@ -130,12 +167,13 @@ export default class Interpreter {
       return new Variable(token.token);
     }
 
-    throw new Error(`Undefined token: ${token.type}`);
+    throw new Error(`Syntax Error: Unexpected token ${token.type}`);
   }
 
   /**
+   * consumes the next factor represented by a number or an number raised to an exponent
    * factor: 
-   * @returns {AST} either an item or an item raised to an exponent
+   * @returns {AST} AST representation of the next factor
    */
   factor (): AST {
     let item = this.item();
@@ -153,9 +191,9 @@ export default class Interpreter {
   }
 
   /**
-   * Eats the next term
+   * Eats the next term represented by a combination of numbers and additions / subtractions
    * term: factor((Exp|Mul|Div)factor)*
-   * 
+   * @returns {AST} AST representation of the next term
    */
   term (): AST {
     let node = this.factor();
@@ -194,6 +232,7 @@ export default class Interpreter {
    */
   parse(code: string, state?): AST {
     this.tokens = tokenize(code);
+    this.parens = [];
     this.variables = state || {};
     this.currentTokenIndex = 0;
     return this.expr();

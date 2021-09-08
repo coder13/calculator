@@ -50,23 +50,49 @@ describe('Creates correct AST', () => {
         )
       )
     );
-    
+
     inter.parse('(8 + 9)(2 - 3)').should.deep.equal(
       new BinOp(
         new BinOp(
           new Num('8'),
           new Token('Operator', '+'),
           new Num('9')
-          ),
-          new Token('Operator', '*'),
-          new BinOp(
-            new Num('2'),
-            new Token('Operator', '-'),
-            new Num('3')
-          )
+        ),
+        new Token('Operator', '*'),
+        new BinOp(
+          new Num('2'),
+          new Token('Operator', '-'),
+          new Num('3')
         )
-      );
-    });
+      )
+    );
+    
+    inter.parse('9(2 - 3)').should.deep.equal(
+      new BinOp(
+        new Num('9'),
+        new Token('Operator', '*'),
+        new BinOp(
+          new Num('2'),
+          new Token('Operator', '-'),
+          new  Num('3'),
+        )
+      )
+    );
+  });
+
+  it('Multiple Operations with mixed parentheses', function () {
+    inter.parse('4(3)[5]').should.deep.equal(
+      new BinOp(
+        new Num('4'),
+        new Token('Operator', '*'),
+        new BinOp(
+          new Num('3'),
+          new Token('Operator', '*'),
+          new Num('5')
+        )
+      )
+    );
+  });
 });
 
 describe('Evaluates expressions', function () {

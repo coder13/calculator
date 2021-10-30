@@ -2,55 +2,9 @@ import { AST, Num, Variable, NegationOp, FunctionOp, BinOp } from './ast';
 import { Token, TokenType, tokenize } from './tokenize';
 
 /*
-  Variables todo:
-  want: addition, subtraction, multiplication, division, exponetiation
-  we need "expressions" to be a set of adding terms
-  this expression object should have a set of expression terms that it multiplies to
-  should also have an exponent expression
-  we need to handle adding like terms, multiplying different terms, canceling out like terms, subtracting like terms
-
-  This expression object should have functions for the 5 operations
-
-  maybe handle distribution? Multiply expression by expression to get another expression
-  raising expression to an integer value can do distribution: for all values in A, multiply all values B, create expression, evaluate expression: (2+t)(3+v)de
-
+  Basic math intepreter modeled after this blog series:
+  https://ruslanspivak.com/lsbasi-part1/
 */
-
-class Term {
-  value: number;
-  factor: number;
-
-  constructor(value: number, factor: number = 1) {
-    this.value = value;
-    this.factor = factor || 1;
-  }
-
-  simplify() {
-
-  }
-
-  evaluate() {
-    
-  }
-};
-
-class Expression {
-  terms: Term[];
-  exponent: Term;
-
-  constructor() {
-    this.terms = [];
-    this.exponent = new Term(1);
-  }
-
-  simplify() {
-
-  }
-
-  evaluate() {
-
-  }
-};
 
 type OpenParen = 'OpenParen' | 'OpenSquareBracket' | 'OpenCurlyBrace';
 type CloseParen = 'CloseParen' | 'CloseCurlyBrace';

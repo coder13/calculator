@@ -1,4 +1,6 @@
-require('chai').should();
+const chai = require('chai');
+const { expect } = chai;
+chai.should();
 
 import { BinOp, FunctionOp, NegationOp, Num } from '../src/ast';
 import { Token } from '../src/tokenize';
@@ -29,5 +31,17 @@ describe('Evaluates AST correctly', function () {
     const negateOp = new NegationOp(new Num('2.2'));
     negateOp.evaluate().should.equal(-2.2);
     negateOp.toString().should.equal('-2.2');
+  });
+
+  it('Throws errors on division by zero', function () {
+    const divisionByZero = new BinOp(new Num('1'), new Token('Operator', '/'), new Num('0'));
+    expect(() => divisionByZero.evaluate()).to.throw('Division by zero');
+  });
+
+  it('Throws errors on undefined input for functions', function () {
+    const negativeLogInput = new FunctionOp(new Token('Function', 'log'), new Num('-2'));
+    expect(() => negativeLogInput.evaluate()).to.throw('Output of log undefined on input -2');
+    const zeroLogInput = new FunctionOp(new Token('Function', 'log'), new Num('0'));
+    expect(() => zeroLogInput.evaluate()).to.throw('Output of log undefined on input 0');
   });
 });

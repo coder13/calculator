@@ -36,6 +36,9 @@ export class BinOp extends AST {
       case '*':
         return left * right;
       case '/':
+        if (right === 0) {
+          throw new Error('Division by zero');
+        }
         return left / right;
       case '^':
         return Math.pow(left, right);
@@ -61,9 +64,15 @@ export class FunctionOp extends AST {
 
   evaluate(): number {
     if (!functions[this.name.token.toLowerCase()]) {
-        throw new Error('Undefined function');
+      throw new Error('Undefined function');
     }
-    return functions[this.name.token.toLowerCase()](this.argument.evaluate());
+    let arg = this.argument.evaluate();
+    const result = functions[this.name.token.toLowerCase()](arg);
+    if (!Number.isFinite(result)) {
+      throw new Error(`Output of ${this.name.token.toLowerCase()} undefined on input ${arg}`);
+    }
+
+    return result;
   }
 
   toString(): string {

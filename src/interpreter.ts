@@ -52,13 +52,14 @@ class Expression {
   }
 };
 
-type OpenParen = 'OpenParen' | 'OpenSquareBracket';
-type CloseParen = 'CloseParen' | 'CloseSquareBracket';
+type OpenParen = 'OpenParen' | 'OpenSquareBracket' | 'OpenCurlyBrace';
+type CloseParen = 'CloseParen' | 'CloseCurlyBrace';
 type Parens = OpenParen | CloseParen;
 
 const ExpectedClosingBracket = {
   OpenParen: 'CloseParen',
   OpenSquareBracket: 'CloseSquareBracket',
+  OpenCurlyBRace: 'CloseCurlyBrace',
 };
 
 export default class Interpreter {
@@ -135,12 +136,12 @@ export default class Interpreter {
 
       token = this.getCurrentToken();
 
-      if (['OpenParen', 'OpenSquareBracket', 'Function', 'Variable'].includes(token.type)) {  
+      if (['OpenParen', 'OpenSquareBracket', 'OpenCurlyBrace', 'Function', 'Variable'].includes(token.type)) {  
         return new BinOp(node, new Token('Operator', '*'), this.factor());
       } else {
         return node;
       }
-    } else if (token.type === 'OpenParen' || token.type === 'OpenSquareBracket') {
+    } else if (token.type === 'OpenParen' || token.type === 'OpenSquareBracket' || token.type === 'OpenCurlyBrace') {
       this.parens.push(token.type);
 
       let node = this.expr();
@@ -148,7 +149,7 @@ export default class Interpreter {
       this.eat(ExpectedClosingBracket[this.parens.pop()]);
 
       if (!this.reachedEndOfInput()
-        && (this.getCurrentToken().type === 'OpenParen' || this.getCurrentToken().type === 'OpenSquareBracket')) {
+        && (['OpenParen', 'OpenSquareBracket', 'OpenCurlyBrace'].includes(this.getCurrentToken().type))) {
         this.parens.push(this.getCurrentToken().type as OpenParen);
 
         this.currentTokenIndex++;

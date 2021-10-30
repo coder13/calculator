@@ -9,6 +9,8 @@ export type TokenType =
   | 'CloseParen'
   | 'OpenSquareBracket'
   | 'CloseSquareBracket'
+  | 'OpenCurlyBrace'
+  | 'CloseCurlyBrace'
   | 'Equals'
   | 'Function'
   | 'Variable'
@@ -37,6 +39,10 @@ export function tokenize (expression: string): Token[] {
       return new Token('OpenSquareBracket', token);
     } else if (token == ']') {
       return new Token('CloseSquareBracket', token);
+    } else if (token == '{') {
+      return new Token('OpenCurlyBrace', token);
+    } else if (token == '}') {
+      return new Token('CloseCurlyBrace', token);
     } else if (token == '=') {
       return new Token('Equals', token);
     } else if (/[a-z]+/i.test(token)) {

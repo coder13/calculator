@@ -102,14 +102,18 @@ export default class Interpreter {
 
       this.eat(ExpectedClosingBracket[this.parens.pop()]);
 
-      if (!this.reachedEndOfInput()
-        && (['OpenParen', 'OpenSquareBracket', 'OpenCurlyBrace'].includes(this.getCurrentToken().type))) {
-        this.parens.push(this.getCurrentToken().type as OpenParen);
+      if (!this.reachedEndOfInput()) {
+        if (['OpenParen', 'OpenSquareBracket', 'OpenCurlyBrace'].includes(this.getCurrentToken().type)) {
+          this.parens.push(this.getCurrentToken().type as OpenParen);
 
-        this.currentTokenIndex++;
-        let expr = this.expr();
-        this.eat(ExpectedClosingBracket[this.parens.pop()]);
-        return new BinOp(node, new Token('Operator', '*'), expr);
+          this.currentTokenIndex++;
+          let expr = this.expr();
+          this.eat(ExpectedClosingBracket[this.parens.pop()]);
+
+          return new BinOp(node, new Token('Operator', '*'), expr);
+        } else if (['Number'].includes(this.getCurrentToken().type)) {
+         return new BinOp(node, new Token('Operator', '*'), this.factor());
+       }
       }
 
       return node;

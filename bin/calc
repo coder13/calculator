@@ -2,7 +2,7 @@
 const debug = require('debug');
 const { Interpreter } = require('../dist/');
 
-if (process.argv.length < 3) {
+if (process.argv.length < 3 || !process.argv[2]) {
   console.log('Usage: calc <expression>');
   process.exit(1);
 }

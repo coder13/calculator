@@ -1,0 +1,118 @@
+#!/usr/bin/env node
+const debug = require('debug');
+const { Parser } = require('expr-eval');
+const { Interpreter, Token, BinOp, FunctionOp, NegationOp, Num, Variable } = require('../dist/');
+
+if (process.argv.length < 3 || !process.argv[2]) {
+  console.log('Usage: tester <expressions to test: number>');
+  process.exit(1);
+}
+
+/**
+ * I'm starting with randomly generating an expression be it a number, function, or binary expression.
+ * From there, I determine if the LHS and RHS of the binary expression should be from this same expression function so it'll randomly generate a number, function, or binary expression once again.
+ * I'm careful not to random go too deep by using the depth variable.
+ * I do the same for if I want a function, it randomly generates an expression as an argument. 
+ */
+
+const operations = ['+', '-', '*', '/'];
+const functions = ['sin', 'cos', 'tan', 'log', 'ln', 'round', 'floor', 'ceil', 'sqrt', 'abs', 'random'];
+const rnd = (n) => (Math.random() * n).toFixed(Math.ceil(Math.random() * 20));
+
+function randomNum() {
+  return Math.random() < 0.125 ? `-${randomNum()}` : String(rnd(20000));
+}
+
+const randomlyDrop = (chars) => (Math.random() < 1/2048) && (Math.random() < 1/2048) ? '' : chars;
+
+function randomExpression(depth) {
+  if (depth <= 1) {
+    return randomNum();
+  }
+
+  let r = Math.random();
+  if (r < 0.5) {
+    return randomlyWrapped(randomBinaryOperation(depth - 1));
+  } else if (r <= 0.85) {
+    return randomlyWrapped(randomFunction(depth - 1));
+  } else if (r <= 1) {
+    return randomlyWrapped(randomNum());
+  }
+}
+
+function randomlyWrapped(expression) {
+  let r = Math.random();
+
+  if (r < 0.25) {
+    return [
+      '(',
+      expression,
+      ')',
+    ].map(randomlyDrop).join('');
+  }
+  return expression;
+}
+
+function randomBinaryOperation(depth) {
+  return [
+    randomExpression(depth - 1),
+    operations[Math.floor(Math.random() * operations.length)],
+    randomExpression(depth - 1)
+  ].map(randomlyDrop).join(' ');
+}
+
+function randomFunction(depth) {
+  return [
+    functions[Math.floor(Math.random() * functions.length)],
+    '(',
+    randomExpression(depth - 1),
+    ')',
+  ].map(randomlyDrop).join('');
+}
+
+let numberOfCorrectlyEvaluated = 0;
+let numberOfSyntaticallyIncorrect = 0;
+
+try {
+  const numberOfExpressions = Number.parseInt(process.argv[2]);
+
+  const inter = new Interpreter();
+
+  for (let i = 0; i < numberOfExpressions; i++) {
+    let code = randomExpression(Math.ceil(Math.random() * 15));
+    debug('code')(code)
+    let p, e;
+    let syntaticallyIncorrectA = false;
+    let syntaticallyIncorrectB = false;
+    
+    try {
+      p = inter.parse(code).evaluate();
+    } catch (e) {
+      syntaticallyIncorrectA = true;
+      debug('error')(e);
+    }
+    
+    try { 
+      e = Parser.evaluate(code);
+    } catch (e) {
+      syntaticallyIncorrectB = true;
+      debug('error')(e);
+    }
+
+    debug('code')(`my parser: ${p}, the other parser: ${e}`);
+    
+    if ((!syntaticallyIncorrectA && !syntaticallyIncorrectB) && p !== e) {
+      console.log(`Error in expression: "${code}". Expected ${e} but got ${p}`);
+    } else if (syntaticallyIncorrectA || syntaticallyIncorrectB) {
+      numberOfSyntaticallyIncorrect++;
+    } else if (!syntaticallyIncorrectA && !syntaticallyIncorrectB && p === e) {
+      numberOfCorrectlyEvaluated++;
+    }
+  }
+} catch (e) {
+  console.error(e);
+  process.exit(1);
+}
+
+console.log(`Correctly parsed ${numberOfCorrectlyEvaluated} expressions`);
+console.log(`Found ${numberOfSyntaticallyIncorrect} to be syntatically incorrect`);

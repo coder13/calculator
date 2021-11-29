@@ -19,7 +19,7 @@ const ExpectedClosingBracket = {
 export default class Interpreter {
   tokens: Token[];
   parens: Parens[];
-  variables: Map<string, number>;
+  //variables: Map<string, number>;
   currentTokenIndex: number;
 
   constructor() {
@@ -176,7 +176,7 @@ export default class Interpreter {
     while (!this.reachedEndOfInput()
         && this.getCurrentToken().type === 'Operator'
         && ['+', '-'].indexOf(this.getCurrentToken().token) > -1) {
-      
+ 
       node = new BinOp(node, this.getNextToken(), this.term());
     }
 
